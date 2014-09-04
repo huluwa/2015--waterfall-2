@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="gbk" />
+	<link href="asset/css.css" type="text/css" rel="stylesheet"/>
+    <script src="asset/core.js" type="text/javascript" ></script>
+    <title>waterfall</title>
+</head>
+
+<body>
+<div class="boutique_nav">
+    <ul class="nav">
+        <li class="current"><a href="waterfall_sina.html"><span>美女</span></a></li>
+        <li><a href="waterfall_sina.html"><span>玩车</span></a></li>
+        <li><a href="waterfall.html"><span>美食</span></a></li>
+    </ul>
+</div>
+<div class="boutique_tab"><div class="tab"><span id="hd" style="background:none"></span><input type="button" value="总数为" onclick="alert($$(document,'slist-item','li').length)" style="padding:3px 10px"></div></div>
+<div class="show">
+    <div id="loading" style="text-align:center">正在加载中......</div>
+    <div class="clearfix">
+        <ul class="show-list"></ul>
+        <ul class="show-list"></ul>
+        <ul class="show-list"></ul>
+        <ul class="show-list"></ul>
+    </div>
+</div>
+<div id="mask-layer" class="mask-layer"></div>
+<script>
+var jp={}
+jp.imgsrc=[];
+jp.mask_layer=document.getElementById('mask-layer');
+jp.page=16;
+jp.cur=0;
+var imgs=(function(){
+    jp.curnub=0;
+    function dialoginit(){
+        if(!jp.d){
+            jp.img=document.createElement('img');
+            jp.span=document.createElement('span');
+            jp.d=document.createElement('div');
+            jp.next=document.createElement('a');
+            jp.previous=document.createElement('a');
+            document.body.appendChild(jp.d);
+            jp.d.appendChild(jp.span);
+            jp.d.appendChild(jp.next);
+            jp.d.appendChild(jp.previous);
+            jp.next.className="next";
+            jp.previous.className="previous";
+            jp.span.innerHTML="图片正在加载中......"
+            jp.span.className="loading";
+            jp.d.className='dialog';
+            jp.d.appendChild(jp.img);
+        }
+    }
+    dialoginit();
+    function resetImg(img){
+        var ch=document.documentElement.clientHeight,cw=document.documentElement.clientWidth,iow=img.offsetWidth,ioh=img.offsetHeight;
+        if((iow/ioh)>=(cw/ch) && iow>=cw){
+            img.style.width=cw+'px';
+        }
+        if((iow/ioh)<(cw/ch) && ioh>=ch){
+            img.style.height=ch+'px';
+        }
+    };
+    function showbig(img){
+        var ch=document.documentElement.clientHeight,cw=document.documentElement.clientWidth,st=0,src;
+        src=img.src.replace("/mw205/","/large/");
+        if(document.all && ([/MSIE (\d)\.0/i.exec(navigator.userAgent)][0][1] == 6)){
+            st=Math.max(document.body.scrollTop,document.documentElement.scrollTop);
+        }
+        !/hidden-scroll/.test(document.body.className) && (document.body.className+=' hidden-scroll');
+
+        jp.mask_layer.style.display="block";
+        jp.mask_layer.style.width=cw+'px';
+        jp.mask_layer.style.height=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)+'px';
+
+        jp.d.style.display="block";
+        jp.d.style.height='100px';
+        jp.d.style.width='300px';
+        jp.d.style.overflow='hidden';
+        jp.d.style.top=st+(ch-jp.d.offsetHeight)*0.382+'px';
+        jp.d.style.left=(cw-jp.d.offsetWidth)/2+'px';
+
+        jp.span.style.display="block";
+        jp.img.style.display="none";
+        jp.img.onload=function(){
+            jp.span.style.display="none";
+            jp.img.style.display="block";
+            jp.img.style.height="auto";
+            jp.img.style.width="auto";
+            resetImg(this);
+            jp.img.style.height=this.offsetHeight+"px";
+            jp.img.style.width=this.offsetWidth+"px";
+            if(ch==this.offsetHeight){
+                jp.d.style.height=ch+'px';
+                jp.d.style.top=st+'px';
+            }else{
+                jp.d.style.height=this.offsetHeight+'px';
+                jp.d.style.top=st+(ch-this.offsetHeight)*0.382+'px';
+            }
+            if(cw==this.offsetWidth){
+                jp.d.style.width=cw+'px';
+                jp.d.style.left="0px";
+            }else{
+                jp.d.style.width=this.offsetWidth+'px';
+                jp.d.style.left=(cw-this.offsetWidth)/2+'px';
+            }
+        }
+        //jp.img.complete?ImgOK():jp.img.onload=ImgOK;
+        jp.img.src=src;
+        jp.curnub=img.n;
+    };
+    function previous(){
+        showbig(jp.imgsrc[jp.curnub=jp.curnub>0 ? jp.curnub-1 : jp.imgsrc.length-1]);
+    }
+
+    function next(){
+        showbig(jp.imgsrc[jp.curnub=jp.curnub<jp.imgsrc.length-1 ? jp.curnub+1 : 0]);
+    }
+
+    document.ondblclick=function(event){
+        var e=event || window.event,o=e.srcElement || e.target;
+        if(o.nodeName.toLocaleLowerCase()==='img' && /imgHandle/.test(o.className)){
+            return false;
+        }
+        if(confirm('确认关闭图片了？')){
+            if(/block/.test(jp.d.style.display) || jp.d.offsetHeight!=0){
+                document.body.className=document.body.className.replace(/\s*hidden-scroll/g,'');
+                jp.d.style.display="none";
+                jp.mask_layer.style.display="none";
+            }
+        }
+    }
+    document.onclick=function(event){
+        var e=event || window.event,o=e.srcElement || e.target;
+        if(o.nodeName.toLocaleLowerCase()==='img' && /imgHandle/.test(o.className)){
+            showbig(o)
+        }
+        if(o.nodeName.toLocaleLowerCase()==='a' && /next/.test(o.className)){
+            next();
+        }
+        if(o.nodeName.toLocaleLowerCase()==='a' && /previous/.test(o.className)){
+            previous();
+        }
+    }
+    document.onkeydown=function(event){
+        var e=event || window.event
+        if(e.keyCode=='37'){
+            previous();
+        }
+        if(e.keyCode=='39'){
+            next();
+        }
+    }
+    return {
+        next:next,
+        previous:previous
+    }
+})();
+
+var jsonint=(function(){
+    var n=0;
+    function show(date){
+        var DocumentFragment=document.createDocumentFragment(),bre=0;
+        document.getElementById('hd').innerHTML='总共'+date.data.length+'张图片';
+
+        !jp.frist && (document.getElementById('loading').style.display='none');
+
+        if(!jp.jsonData){
+            jp.jsonData=date;
+        }
+
+        if(!jp.show_list){
+            jp.show_list=$$(document,'show-list','ul');
+            for(var s=0,ss=jp.show_list.length;s<ss;s++){
+                jp.show_list[s].fragment=document.createDocumentFragment();
+                jp.show_list[s].h=0;
+            }
+        }
+        var snli=(jp.cur+jp.page)<date.data.length ? (jp.cur+jp.page) : date.data.length
+
+        for(var i=!jp.frist ? 0 : jp.cur,len=!jp.frist ? date.data.length : snli;i<len;i++){
+            var val=date.data[i],sl=jp.show_list[i%jp.show_list.length];
+
+            var li=document.createElement('li'),
+                    div=document.createElement('div'),
+                    img=document.createElement('img');
+            sl.fragment.appendChild(li);
+
+            li.appendChild(div);
+            div.appendChild(img);
+            li.className='slist-item';
+            div.className='p';
+            div.style.height=val.h*205/val.w+24+'px';
+            img.className="imgHandle";
+            img.setAttribute('src',val.url);
+            img.setAttribute('width','205');
+            img.setAttribute('height',val.h*205/val.w);
+            img.n=n++;
+            sl.h+=(val.h*205/val.w+70);
+            jp.imgsrc.push(img);
+            jp.cur=i+1;
+            if(!jp.frist){
+                if((offset(sl).y+sl.h) >=document.documentElement.clientHeight && !sl.b){bre=bre+1;sl.b=1};
+                if(bre==ss && i%ss==(ss-1)){
+                    var v=document.createElement('div');
+                    v.style.cssText='clear:both;text-align:center;background:#f1f1f1;line-height:30px'
+                    v.innerHTML='更多';
+                    v.id='more'
+                    jp.show_list[0].parentNode.appendChild(v);
+                    jp.frist=1;
+                    break;
+                }
+            }
+
+        }
+        for(var s=0,ss=jp.show_list.length;s<ss;s++){
+            jp.show_list[s].appendChild(jp.show_list[s].fragment);
+        }
+        showend();
+    }
+    function showend(){
+        if(jp.cur>=jp.jsonData.data.length){
+            removeEvent(window,'scroll',scl);
+            document.getElementById('more').parentNode.removeChild(document.getElementById('more'))
+            return false;
+        }
+    }
+    function scl(){
+        var more=document.getElementById('more'),moreTop=offset(more).y,sTop=Math.max(document.documentElement.scrollTop,document.body.scrollTop),ch=document.documentElement.clientHeight;
+        if((moreTop+more.offsetHeight-sTop)<=ch && !jp.begin){
+            jp.begin=1
+            more.innerHTML='正在加载...'
+            setTimeout(function(){show(jp.jsonData);jp.begin=0},500)
+        }
+    }
+    addEvent(window,'scroll',scl);
+    return {
+        show:show
+    }
+})()
+
+</script>
+<script src="sina_json.js" type="text/javascript"></script>
+</body>
+</html>
